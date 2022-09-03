@@ -27,7 +27,7 @@ module SEND {
     }
 
     /// Initializing `SEND` as coin in Aptos network.
-    public fun initialize_internal(account: &signer) {
+    public entry fun initialize_internal(account: &signer) {
         // Initialize `SEND` as coin type using Aptos Framework.
         let (mint_cap, freeze_cap, burn_cap) = coin::initialize<SEND>(
             account,
