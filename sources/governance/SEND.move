@@ -1,10 +1,10 @@
 address SwapAdmin {
 
 module SEND {
-    use Std::ASCII::string;
-    use AptosFramework::Coin::Self;
-    use Std::Signer;
-    use AptosFramework::TypeInfo;
+    use std::string;
+    use std::signer;
+    use aptos_framework::coin;
+    use aptos_std::type_info;
 
     // Errors
     /// When capability is missed on account.
@@ -29,24 +29,24 @@ module SEND {
     /// Initializing `SEND` as coin in Aptos network.
     public fun initialize_internal(account: &signer) {
         // Initialize `SEND` as coin type using Aptos Framework.
-        let (mint_cap, burn_cap) = Coin::initialize<SEND>(
+        let (mint_cap, freeze_cap, burn_cap) = coin::initialize<SEND>(
             account,
-            string(b"Send Token"),
-            string(b"SEND"),
-            10,
+            string::utf8(b"Send Token"),
+            string::utf8(b"SEND"),
+            18,
             true,
         );
 
         // Store mint and burn capabilities under user account.
         move_to(account, Capability { cap: mint_cap });
         move_to(account, Capability { cap: burn_cap });
-    }
+        move_to(account, Capability { cap: freeze_cap });
+    }  
 
-
-    /// Extract mint or burn capability from user account.
+    /// Extract mint, burn or freeze capability from user account.
     /// Returns extracted capability.
     public fun extract_capability<CapType: store>(account: &signer): CapType acquires Capability {
-        let account_addr = Signer::address_of(account);
+        let account_addr = signer::address_of(account);
 
         // Check if capability stored under account.
         assert!(exists<Capability<CapType>>(account_addr), ERR_CAP_MISSED);
@@ -56,9 +56,9 @@ module SEND {
         cap
     }
 
-    /// Put mint or burn `capability` under user account.
+    /// Put mint, burn or freeze `capability` under user account.
     public fun put_capability<CapType: store>(account: &signer, capability: CapType) {
-        let account_addr = Signer::address_of(account);
+        let account_addr = signer::address_of(account);
 
         // Check if capability doesn't exist under account so we can store.
         assert!(!exists<Capability<CapType>>(account_addr), ERR_CAP_EXISTS);
@@ -69,31 +69,30 @@ module SEND {
         });
     }
 
-    public fun mint(amount: u64, _cap: &Coin::MintCapability<SEND>, account: signer) {
-        let coin = Coin::mint<SEND>(amount, _cap);
-        let account = Signer::address_of(&account);
-        Coin::deposit<SEND>(account, coin);
+    public fun mint(amount: u64, _cap: &coin::MintCapability<SEND>, account: signer) {
+        let coin = coin::mint<SEND>(amount, _cap);
+        let account = signer::address_of(&account);
+        coin::deposit<SEND>(account, coin);
     }
 
     /// Return SEND token address.
     public fun coin_address<SEND>(): address {
-        let type_info = TypeInfo::type_of<SEND>();
-        TypeInfo::account_address(&type_info)
+        let type_info = type_info::type_of<SEND>();
+        type_info::account_address(&type_info)
     }
 
     public fun assert_genesis_address(account : &signer) {
-        assert!(Signer::address_of(account) == coin_address<SEND>(), ERROR_NOT_GENESIS_ACCOUNT);
+        assert!(signer::address_of(account) == coin_address<SEND>(), ERROR_NOT_GENESIS_ACCOUNT);
     }
 
 
     public fun get_balance(owner: address) {
-        Coin::balance<SEND>(owner);
+        coin::balance<SEND>(owner);
     }
 
     /// Return SEND precision.
     public fun precision(): u8 {
         PRECISION
-    }
-
+    }  
 }
 }

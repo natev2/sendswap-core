@@ -5,3 +5,6 @@ version = '1.0.0'
 git = 'https://github.com/davidiw/aptos-core.git'
 rev = 'conversions'
 subdir = 'aptos-move/framework/aptos-framework'
+[addresses]
+Std = "0x1"
+SwapAdmin = "0xca666d520b8fec2cf594aaf4cc0f38055ceec2ae96e54e88c305908e063856d7"
