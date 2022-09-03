@@ -1,0 +1,9 @@
+.DS_Store
+build/
+storage/
+.idea
+.vscode/
+.vs
+data/
+release/
+.aptos
