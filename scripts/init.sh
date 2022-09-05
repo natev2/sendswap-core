@@ -1,12 +1,12 @@
 #!/usr/bin/env -S bash -xe
 
 # Fund the newly created account
-aptos account fund-with-faucet --account 0xca666d520b8fec2cf594aaf4cc0f38055ceec2ae96e54e88c305908e063856d7
+# aptos account fund-with-faucet --account 0xf649a210b9f3c014eb25ec84014eb64e04264c8309325dc38bc5cfd44172a8e9
 
 # Publish the specific module
-aptos move publish
+# aptos move publish --profile swapadmin
 
-# Initialize the Faucet
+# Initialize SEND Token as a Coin on Aptos
 aptos move run \
-    --function-id "0xca666d520b8fec2cf594aaf4cc0f38055ceec2ae96e54e88c305908e063856d7::SEND::initialize_internal" \
-    --profile default
+    --function-id "0xf649a210b9f3c014eb25ec84014eb64e04264c8309325dc38bc5cfd44172a8e9::sendtoken::init_send" \
+    --profile swapadmin
