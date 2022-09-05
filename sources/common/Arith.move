@@ -1,6 +1,6 @@
 address swapadmin {
 /// Helper module to do u64 arith.
-module Arith {
+module arith {
 
     use std::error;
 

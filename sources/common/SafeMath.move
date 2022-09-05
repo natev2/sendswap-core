@@ -1,6 +1,0 @@
-address swapadmin {
-
-module SafeMath {
-
-}    
-}
