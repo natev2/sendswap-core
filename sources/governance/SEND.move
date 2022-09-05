@@ -4,6 +4,7 @@ module sendtoken{
     // Uses >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
     use aptos_framework::coin;
+    use aptos_framework::type_info;
     use std::signer::address_of;
     use std::string;
 
@@ -12,7 +13,7 @@ module sendtoken{
     // Structs >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
     /// SEND Token Marker
-    struct SEND{}
+    struct SEND has copy, drop, store {}
 
      /// Container for Send token capabilities
     struct CoinCapabilities<phantom SEND> has key {
@@ -32,7 +33,16 @@ module sendtoken{
     /// When coin capabilities have not been initialized
     const E_NO_CAPABILITIES: u64 = 2;
 
+    const ERROR_NOT_GENESIS_ACCOUNT: u64 = 3;
+
     // Error codes <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+    // Constants >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    /// precision of SEND token.
+    const PRECISION: u8 = 9;
+
+    // Constants <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
     // Public functions >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -46,6 +56,25 @@ module sendtoken{
         let burn_capability = &borrow_global<CoinCapabilities<SEND>>(
                 @swapadmin).burn_capability;
         coin::burn<SEND>(coins, burn_capability); // Burn coins
+    }
+
+    /// Return SEND token address.
+    public fun coin_address<SEND>(): address {
+        let type_info = type_info::type_of<SEND>();
+        type_info::account_address(&type_info)
+    }
+
+    public fun assert_genesis_address(account : &signer) {
+        assert!(address_of(account) == coin_address<SEND>(), ERROR_NOT_GENESIS_ACCOUNT);
+    }
+
+    public fun get_balance(owner: address) {
+        coin::balance<SEND>(owner);
+    }
+
+    /// Return SEND precision.
+    public fun precision(): u8 {
+        PRECISION
     }
 
     // Public functions <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<

@@ -7,5 +7,5 @@
 # Mint some Send Tokens to an account with Mint Capability
 aptos move run \
     --function-id "swapadmin::sendtoken::mint" \
-    --args string:mint_capability u64:20 \
+    --args  u64:20 \
     --profile swapadmin
